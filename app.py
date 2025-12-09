@@ -128,12 +128,16 @@ if df is not None:
 
             test_size = test_size_percent / 100.0
 
-            try:
-                stratify_arg = y_encoded if len(np.unique(y_encoded)) > 1 else None
-                X_train, X_test, y_train, y_test = train_test_split(
-                    X, y_encoded, test_size=test_size, random_state=42, stratify=stratify_arg
-                )
-
+try:
+    stratify_arg = y_encoded if len(np.unique(y_encoded)) > 1 else None
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y_encoded, test_size=test_size, random_state=42, stratify=stratify_arg
+    )
+except ValueError:
+    # Fallback if stratified split fails due to very small classes
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y_encoded, test_size=test_size, random_state=42, stratify=None
+    )
                 if model_name == "Logistic Regression":
                     model = LogisticRegression(max_iter=1000)
                 else:
